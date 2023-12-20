@@ -59,7 +59,49 @@ class Account
         }
     }
 
-    public function signOut() {
+    public function processLogin($email, $matkhau)
+    {
+        if (isset($_POST['email']) && isset($_POST['matkhau'])) {
+            $sql = "SELECT * FROM taikhoan WHERE email = ? AND matkhau = ?";
+            $stmt = $this->conn_db->mysqli->prepare($sql);
+
+            if ($stmt) {
+                $stmt->bind_param('ss', $email, $matkhau);
+                $stmt->execute();
+
+                $result = $stmt->get_result();
+
+                if ($result) {
+                    $user = $result->fetch_assoc();
+
+                    if ($user) {
+                        $_SESSION['email'] = $user['email'];
+                        $_SESSION['matkhau'] = $user['matkhau'];
+                        $_SESSION['hovaten'] = isset($user['hovaten']) ? $user['hovaten'] : '';
+                        $_SESSION['quyen'] = isset($user['quyen']) ? $user['quyen'] : '';
+
+                        if ($user['quyen'] === null) {
+                            header('location: ./index.php');
+                        } elseif ($user['quyen'] === 1) {
+                            header('location: ./admin/index.php');
+                        }
+                    } else {
+                        header('location: ./index.php?action=login&error=Tên đăng nhập hoặc mật khẩu không đúng!');
+                        exit();
+                    }
+                } else {
+                    echo "Có lỗi trong quá trình lấy dữ liệu từ cơ sở dữ liệu.";
+                }
+            } else {
+                echo "Có lỗi trong quá trình chuẩn bị truy vấn.";
+            }
+        }
+    }
+
+
+
+    public function signOut()
+    {
         if (isset($_SESSION['hovaten'])) {
             unset($_SESSION['hovaten']);
         }
@@ -68,5 +110,4 @@ class Account
         }
         return true;
     }
-    
 }

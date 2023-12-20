@@ -42,4 +42,15 @@ if ($action === ' ') {
     header('location: ./index.php');
 
     exit();
+} elseif ($action === 'processLogin') {
+    $obj = new account;
+
+    $email = $_POST['email'];
+    $matkhau = $_POST['matkhau'];
+    $hovaten = $_POST['hovaten'];
+    $quyen = $_POST['quyen'];
+
+    $obj->processLogin($email, $matkhau, $hovaten, $quyen);
+} elseif ($action === 'login') {
+    require 'views/login.php';
 }
